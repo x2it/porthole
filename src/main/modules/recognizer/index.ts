@@ -191,19 +191,108 @@ function fallbackName(
     }
   }
 
-  // 2) 进程名 - 去除扩展名
-  if (process?.name) {
-    const name = process.name.replace(/\.(exe|bin|app|cmd|sh)$/i, '')
-    if (name && name.length >= 2 && !/^PID \d+$/.test(name)) return name
-  }
-
-  // 3) Server 响应头
+  // 2) Server 响应头 (如 "Python/3.10"、"nginx" 等)
   if (probe?.server) {
-    return probe.server
+    const s = probe.server.trim()
+    if (s && s.length >= 2 && !isGenericServer(s)) {
+      return s
+    }
   }
 
-  // 4) 兜底:端口号足够识别
+  // 3) 端口对应已知指纹名(通过端口匹配到的指纹)
+  //    如果命中过指纹(哪怕端口匹配),优先用指纹名
+  //    这部分由 recognize() 返回,此处 fallback 只处理未命中的情况
+  
+  // 4) 进程名 - 仅在友好时显示
+  if (process?.name) {
+    const friendly = humanizeProcessName(process.name)
+    if (friendly) return friendly
+  }
+
+  // 5) 兜底:端口号 + 服务标识
   return `Service :${port}`
+}
+
+/**
+ * 判断 Server 响应头是否无意义(如 "BaseHTTP/0.6 Python" 这种技术标识)
+ */
+function isGenericServer(server: string): boolean {
+  const s = server.toLowerCase()
+  // 纯技术标识,对用户没意义
+  if (/^basehttp\/\d/i.test(s)) return true
+  if (/^python\//i.test(s)) return true
+  if (/^simplehttp/i.test(s)) return true
+  // 通用 web 服务器名有一定意义,保留
+  return false
+}
+
+/**
+ * 将进程序列名转为友好的人类可读名称
+ * e.g. "orayfilesvr.exe" → "Oray File Service"
+ * e.g. "TRAESOLO CN.exe" → "TRAE SOLO CN"
+ * e.g. "node.exe" → "Node.js"
+ */
+function humanizeProcessName(rawName: string): string | null {
+  // 去除扩展名
+  let name = rawName.replace(/\.(exe|bin|app|cmd|sh|dll|service)$/i, '')
+  
+  // PID 自动名跳过
+  if (/^PID \d+$/i.test(name)) return null
+  
+  // 已知映射表:可执行文件名 → 友好名
+  const knownMap: Record<string, string> = {
+    'node': 'Node.js',
+    'python': 'Python',
+    'java': 'Java',
+    'ruby': 'Ruby',
+    'php': 'PHP',
+    'go': 'Go',
+    'chrome': 'Chrome',
+    'msedge': 'Edge',
+    'firefox': 'Firefox',
+    'code': 'VS Code',
+    'trae': 'Trae',
+    'ollama': 'Ollama',
+    'lm studio': 'LM Studio',
+    'lmstudio': 'LM Studio',
+    'comfyui': 'ComfyUI',
+    'pythonw': 'Python',
+    'python3': 'Python',
+    'uvicorn': 'Uvicorn',
+    'gunicorn': 'Gunicorn',
+    'orayfilesvr': '花生壳',
+    'hskddns': 'HskDDNS',
+    'phtunnel': 'Phtunnel',
+    'oray': 'Oray',
+  }
+  
+  const lower = name.toLowerCase().trim()
+  if (knownMap[lower]) return knownMap[lower]
+  
+  // 驼峰转空格: "OrayFileSvr" → "Oray File Svr"
+  let readable = name
+  readable = readable.replace(/([a-z])([A-Z])/g, '$1 $2')
+  // 下划线/连字符转空格
+  readable = readable.replace(/[_-]+/g, ' ')
+  // 连续空格压缩
+  readable = readable.replace(/\s+/g, ' ').trim()
+  
+  // 判断是否"人类可读":
+  // 1) 包含空格说明有拆分,较好
+  // 2) 至少包含一个元音字母(a/e/i/o/u),否则多半是缩写
+  // 3) 长度合理
+  const hasSpaces = readable.includes(' ')
+  const hasVowel = /[aeiouAEIOU]/.test(readable)
+  const hasChinese = /[\u4e00-\u9fff]/.test(readable)
+  
+  if (!hasSpaces && !hasVowel && !hasChinese) return null
+  if (readable.length < 2 || readable.length > 40) return null
+  
+  // 全是大写缩写且超过4字符 (如 "TRAESOLO"),不可读
+  if (/^[A-Z]{4,}$/.test(readable)) return null
+  
+  // 首字母大写
+  return readable.charAt(0).toUpperCase() + readable.slice(1)
 }
 
 function isGenericTitle(title: string): boolean {
