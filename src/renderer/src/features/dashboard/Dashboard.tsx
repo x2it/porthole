@@ -51,7 +51,7 @@ export function Dashboard({ apps, phase, progress, error, onScan, onOpen, onKill
         {/* 左:标识 */}
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-status-ok" />
-          <span className="text-xs font-medium text-text-primary tracking-tight">Porthole</span>
+          
           <span className="mono text-text-faint">v0.1.0</span>
         </div>
 
@@ -147,7 +147,7 @@ function EmptyState({ onScan }: { onScan: () => void }): JSX.Element {
       <div className="mono text-2xs text-text-faint mb-2">$ porthole --scan</div>
       <h2 className="text-sm font-medium text-text-primary mb-1">No services discovered yet</h2>
       <p className="text-xs text-text-muted mb-4 leading-relaxed">
-        扫描本机 30+ 常见端口,识别 Ollama / LM Studio / ComfyUI 等 Web UI 服务。
+        扫描本机端口,自动识别 Ollama / LM Studio / ComfyUI 等 Web UI 服务。
       </p>
       <div className="flex items-center gap-3">
         <button className="btn-primary" onClick={onScan}>

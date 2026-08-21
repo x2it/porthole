@@ -50,26 +50,30 @@ export async function discoverApps(
       ? resolveFavicon(url, probe.favicon)
       : null
 
-    discovered.push({
-      id: `${host}:${port}`,
-      name,
-      host,
-      port,
-      url,
-      category,
-      confidence,
-      process,
-      probe,
-      health: probe ? 'healthy' : 'unknown',
-      iconUrl,
-      discoveredAt: Date.now()
-    })
+    // 只保留有 HTTP 响应的服务 - 过滤掉系统内部端口(DLL/IPC/数据库等)
+    // 只有能返回 HTTP 响应的才是真正有 Web UI 的服务
+    if (probe) {
+      discovered.push({
+        id: `${host}:${port}`,
+        name,
+        host,
+        port,
+        url,
+        category,
+        confidence,
+        process,
+        probe,
+        health: 'healthy',
+        iconUrl,
+        discoveredAt: Date.now()
+      })
+    }
 
     // 阶段标识:匹配完成(对每个 app 即时)
     onProgress?.({ phase: 'matching', current: i + 1, total: openPorts.length })
   }
 
-  onProgress?.({ phase: 'done', current: openPorts.length, total: openPorts.length })
+  onProgress?.({ phase: 'done', current: discovered.length, total: discovered.length })
   return discovered
 }
 

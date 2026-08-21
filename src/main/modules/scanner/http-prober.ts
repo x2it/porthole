@@ -4,7 +4,7 @@ import type { HttpProbe } from '@shared/types'
  * HTTP 探测 - 请求目标端口并提取识别特征
  * 用 Node 18+ 内置 fetch,0 依赖
  */
-export async function probeHttp(url: string, timeoutMs = 2000): Promise<HttpProbe | null> {
+export async function probeHttp(url: string, timeoutMs = 5000): Promise<HttpProbe | null> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
 

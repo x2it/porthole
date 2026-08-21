@@ -19,8 +19,15 @@ export function registerIpcHandlers(getMainWindow: () => BrowserWindow | null): 
     const mainWindow = getMainWindow()
     const processMap = await resolveAllPortProcesses()
 
+    // 合并:所有正在监听的端口 + 白名单端口
+    // 这样既能发现自定义端口上的真实服务,又不漏掉白名单中的常见端口
+    const { getScanPorts } = await import('../modules/scanner/port-scanner')
+    const whitelist = getScanPorts()
+    const listeningPorts = [...processMap.keys()]
+    const allPorts = [...new Set([...whitelist, ...listeningPorts])].sort((a, b) => a - b)
+
     const apps = await discoverApps(
-      {},
+      { ports: allPorts },
       (port) => processMap.get(port) ?? null,
       (progress: ScanProgress) => {
         mainWindow?.webContents.send(Channels.PROGRESS, progress)
