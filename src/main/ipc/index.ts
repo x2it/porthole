@@ -19,10 +19,14 @@ export function registerIpcHandlers(getMainWindow: () => BrowserWindow | null): 
     const mainWindow = getMainWindow()
     const processMap = await resolveAllPortProcesses()
 
-    // 合并:所有正在监听的端口 + 白名单端口
-    // 这样既能发现自定义端口上的真实服务,又不漏掉白名单中的常见端口
+    // 合并:所有正在监听的端口 + 白名单端口(内置 + 用户指纹库)
     const { getScanPorts } = await import('../modules/scanner/port-scanner')
-    const whitelist = getScanPorts()
+    const builtinPorts = getScanPorts()
+    
+    // 用户自定义指纹端口 - 直接读取 JSON 文件
+    const userPorts = loadUserFingerprintPorts()
+    const whitelist = [...new Set([...builtinPorts, ...userPorts])]
+    
     const listeningPorts = [...processMap.keys()]
     const allPorts = [...new Set([...whitelist, ...listeningPorts])].sort((a, b) => a - b)
 
@@ -41,6 +45,39 @@ export function registerIpcHandlers(getMainWindow: () => BrowserWindow | null): 
     await shell.openExternal(url)
     return true
   })
+
+/**
+ * 从 fingerprints.json 加载用户自定义指纹的端口
+ * 直接同步读取,避免 tree-shaking 问题
+ */
+function loadUserFingerprintPorts(): number[] {
+  try {
+    const { existsSync, readFileSync } = require('node:fs')
+    const { join } = require('node:path')
+    const candidates = [
+      join(process.cwd(), 'fingerprints.json'),
+      join(process.env.APPDATA ?? '', 'porthole', 'fingerprints.json'),
+    ]
+    const ports = new Set<number>()
+    for (const p of candidates) {
+      if (p && existsSync(p)) {
+        try {
+          const data = JSON.parse(readFileSync(p, 'utf-8'))
+          if (Array.isArray(data)) {
+            for (const fp of data) {
+              for (const port of (fp.defaultPorts ?? [])) {
+                if (typeof port === 'number') ports.add(port)
+              }
+            }
+          }
+        } catch {}
+      }
+    }
+    return [...ports]
+  } catch {
+    return []
+  }
+}
 
   // kill 进程(Windows: taskkill /F /PID xxx)
   ipcMain.handle(Channels.KILL_PROCESS, async (_event, pid: number) => {

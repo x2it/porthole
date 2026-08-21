@@ -41,22 +41,27 @@ async function resolveWindows(portMap: Map<number, ProcessInfo>): Promise<void> 
 
   if (pidByPort.size === 0) return
 
-  // 2) 批量查询进程信息
+  // 2) 查询所有进程信息 - 一次性获取全部进程列表再匹配
   const pids = [...new Set(pidByPort.values())]
-  const pidChunks = chunk(pids, 50) // tasklist /FI 一次最多约这么多
   const processByName = new Map<number, ProcessInfo>()
 
-  for (const chunk of pidChunks) {
-    const filter = chunk.map((p) => p).join(',')
-    try {
-      // tasklist 支持多 PID 查询
-      const { stdout } = await execAsync(
-        `tasklist /FI "PID eq ${chunk[0]}" /FO CSV /NH`,
-        { maxBuffer: 5 * 1024 * 1024 }
-      )
-      parseTasklistCsv(stdout, processByName)
-    } catch {
-      // 忽略单个 chunk 失败
+  try {
+    // 获取所有进程列表(比逐个查询快得多)
+    const { stdout } = await execAsync(
+      'tasklist /FO CSV /NH',
+      { maxBuffer: 10 * 1024 * 1024 }
+    )
+    parseTasklistCsv(stdout, processByName)
+  } catch {
+    // fallback: 逐个查询
+    for (const pid of pids) {
+      try {
+        const { stdout } = await execAsync(
+          `tasklist /FI "PID eq ${pid}" /FO CSV /NH`,
+          { maxBuffer: 1024 * 1024 }
+        )
+        parseTasklistCsv(stdout, processByName)
+      } catch { /* ignore */ }
     }
   }
 
@@ -65,9 +70,8 @@ async function resolveWindows(portMap: Map<number, ProcessInfo>): Promise<void> 
     const info = processByName.get(pid)
     if (info) {
       portMap.set(port, { ...info, pid })
-    } else {
-      portMap.set(port, { pid, name: `PID ${pid}` })
     }
+    // 查不到进程名时不设置 name,让 fallbackName 处理
   }
 }
 

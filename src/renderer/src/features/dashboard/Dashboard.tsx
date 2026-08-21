@@ -22,9 +22,10 @@ const PHASE_LABEL: Record<string, string> = {
 export function Dashboard({ apps, phase, progress, error, onScan, onOpen, onKill }: DashboardProps): JSX.Element {
   const stats = useMemo(() => {
     const total = apps.length
-    const recognized = apps.filter((a) => a.category !== 'unknown').length
-    const unknown = total - recognized
-    return { total, recognized, unknown }
+    const matched = apps.filter((a) => a.confidence > 0).length
+    const autoCategorized = apps.filter((a) => a.category !== 'unknown' && a.confidence === 0).length
+    const unknown = total - matched - autoCategorized
+    return { total, matched, autoCategorized, unknown }
   }, [apps])
 
   const isScanning = phase === 'scanning'
@@ -66,13 +67,23 @@ export function Dashboard({ apps, phase, progress, error, onScan, onOpen, onKill
           ) : apps.length > 0 ? (
             <>
               <span className="dot bg-status-ok" />
-              <span>ready</span>
-              <span className="text-text-faint">·</span>
-              <span>{stats.recognized}/{stats.total} matched</span>
+              <span>{stats.total} services</span>
+              {stats.matched > 0 && (
+                <>
+                  <span className="text-text-faint">·</span>
+                  <span className="text-status-ok/80">{stats.matched} identified</span>
+                </>
+              )}
+              {stats.autoCategorized > 0 && (
+                <>
+                  <span className="text-text-faint">·</span>
+                  <span className="text-status-warn/70">{stats.autoCategorized} categorized</span>
+                </>
+              )}
               {stats.unknown > 0 && (
                 <>
                   <span className="text-text-faint">·</span>
-                  <span className="text-status-warn/80">{stats.unknown} unknown</span>
+                  <span className="text-text-faint">{stats.unknown} pending</span>
                 </>
               )}
             </>

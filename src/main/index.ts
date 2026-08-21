@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
+import { existsSync, writeFileSync, mkdirSync } from 'node:fs'
 import { registerIpcHandlers } from './ipc'
 
 let mainWindow: BrowserWindow | null = null
@@ -68,6 +69,29 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // 创建默认 fingerprints.json(如果不存在)
+  const userDataPath = app.getPath('userData')
+  const fingerprintsFile = join(userDataPath, 'fingerprints.json')
+  if (!existsSync(fingerprintsFile)) {
+    const defaultFingerprints = [
+      {
+        id: 'example',
+        name: 'Example App',
+        category: 'dev-tool',
+        defaultPorts: [3000],
+        titleKeywords: ['example'],
+        processKeywords: ['example']
+      }
+    ]
+    try {
+      mkdirSync(userDataPath, { recursive: true })
+      writeFileSync(fingerprintsFile, JSON.stringify(defaultFingerprints, null, 2), 'utf-8')
+      console.log(`[porthole] created default fingerprints.json at ${fingerprintsFile}`)
+    } catch (e) {
+      console.warn('[porthole] failed to create default fingerprints:', e)
+    }
+  }
+
   // 注册 IPC handlers
   registerIpcHandlers(getMainWindow)
 
