@@ -18,6 +18,7 @@ export function useDiscoveredApps(): UseDiscoveredApps {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!window.hub) return
     const unsubscribe = window.hub.onProgress((p) => setProgress(p))
     return unsubscribe
   }, [])
@@ -27,7 +28,7 @@ export function useDiscoveredApps(): UseDiscoveredApps {
     setError(null)
     setProgress({ phase: 'scanning-ports', current: 0, total: 0 })
     try {
-      const result = await window.hub.discover()
+      const result = window.hub ? await window.hub.discover() : []
       setApps(result)
       setPhase('done')
     } catch (err) {
