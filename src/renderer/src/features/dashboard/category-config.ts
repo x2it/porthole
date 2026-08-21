@@ -18,7 +18,7 @@ export const CATEGORY_CONFIG: Record<AppCategory, CategoryConfig> = {
   media: { label: 'MEDIA', className: 'bg-bg-subtle text-text-muted' },
   proxy: { label: 'PROXY', className: 'bg-bg-subtle text-text-muted' },
   container: { label: 'CONTAINER', className: 'bg-bg-subtle text-text-muted' },
-  unknown: { label: 'APP', className: 'bg-bg-subtle text-text-primary' }
+  unknown: { label: '', className: 'hidden' }
 }
 
 /** 健康状态 → 状态点颜色 */

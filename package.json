@@ -1,6 +1,6 @@
 {
   "name": "porthole",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "本地 Web UI 应用中枢 - 发现、识别、管理本地所有 Web 服务",
   "main": "./out/main/index.js",
   "author": "porthole",
@@ -47,13 +47,15 @@
       "target": [
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "porthole-portable-${version}.${ext}"
     },
     "portable": {
-      "artifactName": "porthole-portable.exe"
+      "artifactName": "porthole-${version}-portable.exe"
     }
   }
 }

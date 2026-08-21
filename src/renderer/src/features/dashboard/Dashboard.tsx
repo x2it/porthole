@@ -52,7 +52,7 @@ export function Dashboard({ apps, phase, progress, error, onScan, onOpen, onKill
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-status-ok" />
           
-          <span className="mono text-text-faint">v0.1.0</span>
+          <span className="mono text-text-faint">v0.2.0</span>
         </div>
 
         {/* 中:状态 */}
