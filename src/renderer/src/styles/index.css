@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Design Tokens - 双主题,深色优先
+   色板取自 zinc/slate 灰阶,状态色克制使用
+   ============================================================ */
+:root {
+  /* 深色(默认)- 极客工具基调 */
+  --bg-base: 10 10 11;          /* #0a0a0b */
+  --bg-muted: 19 19 22;         /* #131316 */
+  --bg-subtle: 28 28 32;        /* #1c1c20 */
+  --bg-elevated: 34 34 39;      /* #222227 */
+
+  --border: 38 38 43;           /* #26262b */
+  --border-strong: 58 58 66;   /* #3a3a42 */
+  --border-faint: 31 31 36;     /* #1f1f24 */
+
+  --text-primary: 237 237 240;  /* #ededf0 */
+  --text-muted: 138 138 148;    /* #8a8a94 */
+  --text-faint: 90 90 100;      /* #5a5a64 */
+
+  --status-ok: 16 185 129;      /* emerald-500 */
+  --status-warn: 245 158 11;    /* amber-500 */
+  --status-err: 239 68 68;      /* red-500 */
+  --status-info: 59 130 246;    /* blue-500 */
+
+  --accent: 237 237 240;        /* 强调=主文字色,极克制 */
+  --accent-muted: 138 138 148;
+}
+
+/* 浅色模式 - 跟随系统偏好 */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-base: 255 255 255;
+    --bg-muted: 249 249 250;     /* zinc-50 */
+    --bg-subtle: 244 244 245;    /* zinc-100 */
+    --bg-elevated: 255 255 255;
+
+    --border: 228 228 231;       /* zinc-200 */
+    --border-strong: 212 212 216;
+    --border-faint: 234 234 238;
+
+    --text-primary: 24 24 27;    /* zinc-900 */
+    --text-muted: 82 82 91;      /* zinc-600 */
+    --text-faint: 161 161 170;   /* zinc-400 */
+
+    --accent: 24 24 27;
+    --accent-muted: 82 82 91;
+  }
+}
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+  }
+  body {
+    @apply bg-bg-base text-text-primary font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 滚动条 - 极客工具标配 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-strong));
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--text-faint));
+  }
+
+  /* 选中态 */
+  ::selection {
+    background: rgb(var(--status-info) / 0.3);
+    color: rgb(var(--text-primary));
+  }
+}
+
+@layer components {
+  /* 按钮 - 无阴影,描边为主 */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-btn
+           text-xs font-medium transition-colors duration-100 ease-out-soft
+           disabled:opacity-40 disabled:cursor-not-allowed
+           focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-bg-base hover:bg-accent/90;
+  }
+  .btn-ghost {
+    @apply btn text-text-muted hover:bg-bg-subtle hover:text-text-primary;
+  }
+  .btn-danger {
+    @apply btn text-status-err hover:bg-status-err/10;
+  }
+
+  /* 卡片 - 纯描边,无阴影,hover 只换底色 */
+  .card {
+    @apply bg-bg-muted border border-border rounded-card p-3
+           transition-colors duration-100 ease-out-soft
+           hover:bg-bg-subtle hover:border-border-strong;
+  }
+
+  /* 标签 - 极小,弱化 */
+  .tag {
+    @apply inline-flex items-center px-1.5 h-[18px] rounded-tag
+           text-2xs font-medium tracking-wide uppercase;
+  }
+
+  /* 等宽技术信息 */
+  .mono {
+    @apply font-mono text-2xs tracking-tight;
+  }
+
+  /* 状态点 */
+  .dot {
+    @apply inline-block w-1.5 h-1.5 rounded-full flex-shrink-0;
+  }
+
+  /* 快捷键提示 */
+  .kbd {
+    @apply inline-flex items-center justify-center min-w-[18px] h-[18px] px-1
+           rounded-tag border border-border bg-bg-subtle
+           font-mono text-2xs text-text-faint;
+  }
+}
