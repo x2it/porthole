@@ -1,6 +1,10 @@
-# Porthole
+# 本地 Web UI 中枢 · Porthole
 
 本地 Web UI 应用中枢 — 发现、识别、管理本机所有 Web 服务。
+
+**Porthole** is a geek-style desktop tool to discover, identify, and manage all local Web UI services (Ollama, LM Studio, ComfyUI, Jupyter, etc.) running on your machine. It scans listening ports, fingerprints known apps, and presents them as clean cards — no more hunting for `127.0.0.1:port` in your browser history.
+
+<img src="https://raw.githubusercontent.com/x2it/porthole/main/banner.png" alt="本地 Web UI 中枢 · Porthole" width="100%">
 
 ## 特性
 
@@ -125,6 +129,6 @@ npm run typecheck  # 类型检查
 
 - 初始版本:端口扫描 + 指纹识别 + 卡片展示
 
-## License
+## 许可证
 
-MIT
+[MIT](LICENSE) © 2026 知行工作室 Zhixing Studio · [https://w3b.pub/](https://w3b.pub/) · support@w3b.pub
