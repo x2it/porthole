@@ -2,11 +2,13 @@
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-Current version / 当前版本：0.2.0
+**Current version / 当前版本：0.2.0**（已归档停止更新）
 
-本地 Web UI 应用中枢 — 发现、识别、管理本机所有 Web 服务。
+> **⚠️ 本项目已停止更新，归档保留。**
+>
+> Porthole 是早期的本地 Web UI 中枢（发现、识别、管理本机 Web 服务：Ollama / LM Studio / ComfyUI 等）。该能力已融入新一代 **[VELA](https://vela.app.workbuddy.host)** —— 知行工作室的本地 Agent 平台（本地 CLI · Web 控制台 · 下载服务）。以下文档仅供历史参考。
 
-**Porthole** is a geek-style desktop tool to discover, identify, and manage all local Web UI services (Ollama, LM Studio, ComfyUI, Jupyter, etc.) running on your machine. It scans listening ports, fingerprints known apps, and presents them as clean cards — no more hunting for `127.0.0.1:port` in your browser history.
+**Porthole** is an **archived** geek-style desktop tool to discover, identify, and manage all local Web UI services (Ollama, LM Studio, ComfyUI, Jupyter, etc.) running on your machine. It scans listening ports, fingerprints known apps, and presents them as clean cards. Its capabilities have been merged into **[VELA](https://vela.app.workbuddy.host)**.
 
 <img src="https://raw.githubusercontent.com/x2it/porthole/main/banner.png" alt="本地 Web UI 中枢 · Porthole" width="100%">
 
