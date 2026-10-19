@@ -1,5 +1,7 @@
 # 本地 Web UI 中枢 · Porthole
 
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+
 Current version / 当前版本：0.2.0
 
 本地 Web UI 应用中枢 — 发现、识别、管理本机所有 Web 服务。
